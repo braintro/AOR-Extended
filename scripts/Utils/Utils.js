@@ -83,7 +83,7 @@ drawingUtils.InitOurPlayerCanvas(canvasOurPlayer, contextOurPlayer);
 
 
 const socket = new WebSocket('ws://localhost:5002');
-      
+
 socket.addEventListener('open', (event) => {
   console.log('Connected to the WebSocket server.');
 
@@ -97,8 +97,7 @@ socket.addEventListener('message', (event) => {
 
   var extractedDictionary = JSON.parse(data.dictionary);
 
-  switch (extractedString)
-  {
+  switch (extractedString) {
     case "request":
       onRequest(extractedDictionary["parameters"]);
       break;
@@ -114,8 +113,7 @@ socket.addEventListener('message', (event) => {
 });
 
 
-function onEvent(Parameters)
-{
+function onEvent(Parameters) {
   const id = parseInt(Parameters[0]);
   const eventCode = Parameters[252];
   switch (eventCode) {
@@ -145,10 +143,10 @@ function onEvent(Parameters)
       trackFootprintsHandler.updateFootprintPosition(id, posX, posY);
       break;
 
-        case EventCodes.NewPlayer:
-            playersHandler.handleNewPlayerEvent(Parameters);
-            break;
-			
+    case EventCodes.NewPlayer:
+      playersHandler.handleNewPlayerEvent(Parameters);
+      break;
+
     case EventCodes.NewCharacter:
       playersHandler.handleNewPlayerEvent(Parameters);
       break;
@@ -189,7 +187,7 @@ function onEvent(Parameters)
       playersHandler.handleMountedPlayerEvent(id, Parameters);
       break;
 
-        case EventCodes.NewRandomDungeon:
+    case EventCodes.NewRandomDungeon:
       dungeonsHandler.dungeonEvent(Parameters);
       break;
 
@@ -220,11 +218,9 @@ function onEvent(Parameters)
   }
 };
 
-function onRequest(Parameters)
-{ 
+function onRequest(Parameters) {
   // Player moving
-    if (Parameters[253] == 21)
-    {
+  if (Parameters[253] == 21) {
     lpX = Parameters[1][0];
     lpY = Parameters[1][1];
 
@@ -232,16 +228,13 @@ function onRequest(Parameters)
   }
 };
 
-function onResponse(Parameters)
-{
+function onResponse(Parameters) {
   // Player join new map
-    if (Parameters[253] == 35)
-    {
+  if (Parameters[253] == 35) {
     map.id = Parameters[0];
   }
   // All data on the player joining the map (us)
-    else if (Parameters[253] == 2)
-    {
+  else if (Parameters[253] == 2) {
     lpX = Parameters[9][0];
     lpY = Parameters[9][1];
   }
@@ -263,8 +256,8 @@ function render() {
   wispCageDrawing.Draw(context, wispCageHandler.cages);
   fishingDrawing.Draw(context, fishingHandler.fishes);
   dungeonsDrawing.Draw(context, dungeonsHandler.dungeonList);
-    playersDrawing.invalidate(context, playersHandler.playersInRange);
-    trackFootprintsDrawing.invalidate(context, trackFootprintsHandler.getFootprintsList());
+  playersDrawing.invalidate(context, playersHandler.playersInRange);
+  trackFootprintsDrawing.invalidate(context, trackFootprintsHandler.getFootprintsList());
 }
 
 var previousTime = performance.now();
@@ -284,14 +277,14 @@ function update() {
   const t = Math.min(1, deltaTime / 100);
 
 
-    if (settings.showMapBackground)
-        mapsDrawing.interpolate(map, lpX, lpY, t);
+  if (settings.showMapBackground)
+    mapsDrawing.interpolate(map, lpX, lpY, t);
 
   harvestablesHandler.removeNotInRange(lpX, lpY);
-    harvestablesDrawing.interpolate(harvestablesHandler.harvestableList, lpX, lpY, t);
+  harvestablesDrawing.interpolate(harvestablesHandler.harvestableList, lpX, lpY, t);
 
 
-    mobsDrawing.interpolate(mobsHandler.mobsList, mobsHandler.mistList, lpX, lpY, t);
+  mobsDrawing.interpolate(mobsHandler.mobsList, mobsHandler.mistList, lpX, lpY, t);
 
 
   chestsDrawing.interpolate(chestsHandler.chestsList, lpX, lpY, t);
@@ -299,7 +292,7 @@ function update() {
   fishingDrawing.Interpolate(fishingHandler.fishes, lpX, lpY, t);
   dungeonsDrawing.interpolate(dungeonsHandler.dungeonList, lpX, lpY, t);
   playersDrawing.interpolate(playersHandler.playersInRange, lpX, lpY, t);
-    trackFootprintsDrawing.interpolate(trackFootprintsHandler.getFootprintsList(), lpX, lpY, t);
+  trackFootprintsDrawing.interpolate(trackFootprintsHandler.getFootprintsList(), lpX, lpY, t);
 
   previousTime = currentTime;
 }
@@ -308,19 +301,17 @@ function drawItems() {
 
   contextItems.clearRect(0, 0, canvasItems.width, canvasItems.height);
 
-    if (settings.settingItems)
-    {
-        playersDrawing.drawItems(contextItems, canvasItems, playersHandler.playersInRange, settings.settingItemsDev);
+  if (settings.settingItems) {
+    playersDrawing.drawItems(contextItems, canvasItems, playersHandler.playersInRange, settings.settingItemsDev);
   }
 
 }
 const intervalItems = 500;
 setInterval(drawItems, intervalItems);
 
-function checkLocalStorage()
-{
+function checkLocalStorage() {
   settings.update(settings);
-    setDrawingViews();
+  setDrawingViews();
 }
 
 const interval = 300;
@@ -336,65 +327,65 @@ document.getElementById("button").addEventListener("click", function () {
   mobsHandler.mobsList = [];
   mobsHandler.mistList = [];
   playersHandler.playersInRange = [];
-    playersDrawing.images = {};
+  playersDrawing.images = {};
 });
 
 setDrawingViews();
 
 function setDrawingViews() {
-    const mainWindowMarginXValue = localStorage.getItem("mainWindowMarginX");
-    const mainWindowMarginYValue = localStorage.getItem("mainWindowMarginY");
-    const itemsWindowMarginXValue = localStorage.getItem("itemsWindowMarginX");
-    const itemsWindowMarginYValue = localStorage.getItem("itemsWindowMarginY");
-    const settingItemsBorderValue = localStorage.getItem("settingItemsBorder");
-    const buttonMarginXValue = localStorage.getItem("buttonMarginX");
-    const buttonMarginYValue = localStorage.getItem("buttonMarginY");
+  const mainWindowMarginXValue = localStorage.getItem("mainWindowMarginX");
+  const mainWindowMarginYValue = localStorage.getItem("mainWindowMarginY");
+  const itemsWindowMarginXValue = localStorage.getItem("itemsWindowMarginX");
+  const itemsWindowMarginYValue = localStorage.getItem("itemsWindowMarginY");
+  const settingItemsBorderValue = localStorage.getItem("settingItemsBorder");
+  const buttonMarginXValue = localStorage.getItem("buttonMarginX");
+  const buttonMarginYValue = localStorage.getItem("buttonMarginY");
 
-    const itemsWidthValue = localStorage.getItem("itemsWidth");
-    const itemsHeightValue = localStorage.getItem("itemsHeight");
+  const itemsWidthValue = localStorage.getItem("itemsWidth");
+  const itemsHeightValue = localStorage.getItem("itemsHeight");
 
-    // Check if the values exist in local storage and handle them
-    if (mainWindowMarginXValue !== null) {
-        //document.getElementById('drawCanvas').style.left = mainWindowMarginYValue + "px";
+  // Check if the values exist in local storage and handle them
+  if (mainWindowMarginXValue !== null) {
+    //document.getElementById('drawCanvas').style.left = mainWindowMarginYValue + "px";
 }
 
-    if (mainWindowMarginYValue !== null) {
-       // document.getElementById('drawCanvas').style.top = mainWindowMarginYValue + "px";
+  if (mainWindowMarginYValue !== null) {
+    // document.getElementById('drawCanvas').style.top = mainWindowMarginYValue + "px";
 }
 
-    if (itemsWindowMarginXValue !== null) {
-       // document.getElementById('thirdCanvas').style.left = itemsWindowMarginXValue + "px";
+  if (itemsWindowMarginXValue !== null) {
+    // document.getElementById('thirdCanvas').style.left = itemsWindowMarginXValue + "px";
     }
 
-    if (itemsWindowMarginYValue !== null) {
-       // document.getElementById('thirdCanvas').style.top = itemsWindowMarginYValue + "px";
+  if (itemsWindowMarginYValue !== null) {
+    // document.getElementById('thirdCanvas').style.top = itemsWindowMarginYValue + "px";
   }
 
-    if (itemsWidthValue !== null) {
-       // document.getElementById('thirdCanvas').style.width = itemsWidthValue + "px";
+  if (itemsWidthValue !== null) {
+  // document.getElementById('thirdCanvas').style.width = itemsWidthValue + "px";
   }
 
-    if (itemsHeightValue !== null) {
-      //  document.getElementById('thirdCanvas').style.height = itemsHeightValue + "px";
+  if (itemsHeightValue !== null) {
+  //  document.getElementById('thirdCanvas').style.height = itemsHeightValue + "px";
 }
 
-    if (settingItemsBorderValue !== null) {
-        // Apply border based on the settingItemsBorderValue
-        if (settingItemsBorderValue === "true") {
+  if (settingItemsBorderValue !== null) {
+    // Apply border based on the settingItemsBorderValue
+    if (settingItemsBorderValue === "true") {
 
-            //document.getElementById('thirdCanvas').style.border = "2px solid grey";
+      //document.getElementById('thirdCanvas').style.border = "2px solid grey";
   } else {
 
-            //document.getElementById('thirdCanvas').style.border = "none";
+      //document.getElementById('thirdCanvas').style.border = "none";
   }
 }
 
-    if (buttonMarginXValue !== null) {
-        //document.getElementById('button').style.left = buttonMarginXValue + "px";
+  if (buttonMarginXValue !== null) {
+  //document.getElementById('button').style.left = buttonMarginXValue + "px";
 }
 
-    if (buttonMarginYValue !== null) {
-        //document.getElementById('button').style.top = buttonMarginYValue + "px";
+  if (buttonMarginYValue !== null) {
+  //document.getElementById('button').style.top = buttonMarginYValue + "px";
   }
 
 
