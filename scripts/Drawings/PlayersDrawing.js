@@ -1,170 +1,154 @@
-export class PlayersDrawing extends DrawingUtils {
-    constructor(Settings) {
+export class PlayersDrawing extends DrawingUtils 
+{
+    constructor(Settings)
+    {
         super(Settings);
+
         this.itemsInfo = {};
     }
 
-    updateItemsInfo(newData) {
+    updateItemsInfo(newData)
+    {
         this.itemsInfo = newData;
     }
 
-    sortPlayersByDistance(players) {
-        // Sort all players by their distance and return the top 8 closest players
-        return players.slice().sort((a, b) => a.distance - b.distance).slice(0, 8);
+    drawItems(context, canvas, players, devMode)
+    {
+        let posY = 15;
+
+        if (players.length <= 0)
+        {
+            this.settings.ClearPreloadedImages("Items");
+            return;
     }
 
-    drawItems(context, canvas, players, devMode, alreadyFilteredPlayers, filteredGuilds, filteredAlliances) {
-        const canvasHeight = 500; // Total canvas height
-        const canvasWidth = 500;
-        const gap = 2;
-        const playerBoxHeight = Math.floor((canvasHeight - (gap * 9)) / 8); // Adjusted for 8 players with gaps
-        const playerBoxWidth = canvasWidth;
-        const itemSize = 60; // Increased item icon size
-        const itemGap = 5; // Small gap between items
+        for (const playerOne of players)
+        {
+            const items = playerOne.items;
 
-        const sortedPlayers = players.length > 0 ? this.sortPlayersByDistance(players) : [];
+            if (items == null) continue;
         
-        // Get the original top 8 players by maintaining their order
-        const top8 = sortedPlayers.map(player => player.nickname);
-        const originalTop8 = players.filter(player => top8.includes(player.nickname));
 
-        // Draw player box backgrounds first
-        context.fillStyle = "rgba(128, 128, 128, 0.1)";
-        for (let i = 0; i < 8; i++) {
-            const posY = i * (playerBoxHeight + gap) + gap; // Adjusted to account for gap at the top
-            context.fillRect(0, posY, playerBoxWidth, playerBoxHeight);
-        }
+            let posX = 5;
+            const total = posY + 20;
 
-        // Draw player information on top of the backgrounds
-        for (let i = 0; i < 8; i++) {
-            const playerOne = originalTop8[i] || null;
-            const posY = i * (playerBoxHeight + gap) + gap; // Adjusted to account for gap at the top
+            // TODO
+            // Show more than few players 
+            if (total > canvas.height) break; // Ecxeed canvas size
 
-            if (playerOne) {
-                // Skip filtered players
-                const isFiltered = filteredGuilds.find(name => name === playerOne.guildName.toUpperCase()) ||
-                    filteredAlliances.find(name => name === playerOne.alliance.toUpperCase()) ||
-                    alreadyFilteredPlayers.find(name => name === playerOne.nickname.toUpperCase());
+            const flagId = playerOne.flagId || 0
+            const flagName = FactionFlagInfo[flagId]
+            this.DrawCustomImage(context, posX + 10, posY - 5, flagName, 'Flags', 20)
+            let posTemp = posX + 25
 
-                if (isFiltered) continue;
+            const nickname = playerOne.nickname;
+            this.drawTextItems(posTemp, posY, nickname, context, "14px", "white");
 
-                let posX = 15;
+            posTemp += context.measureText(nickname).width + 10;
+            this.drawTextItems(posTemp, posY, playerOne.currentHealth + "/" + playerOne.initialHealth, context, "14px", "red");
 
-                // Draw flag
-                const flagId = playerOne.flagId || 0;
-                const flagName = FactionFlagInfo[flagId];
-                this.DrawCustomImage(context, posX, posY + 22, flagName, "Flags", 25);
+            posTemp += context.measureText(playerOne.currentHealth + "/" + playerOne.initialHealth).width + 10;
 
-                // Draw player name
-                this.drawTextItems(posX + 15, posY + 27, playerOne.nickname, context, "15px", "white");
+            let itemsListString = "";
 
-                // Draw player HP
-                this.drawTextItems(posX + 15, posY + 47, `${playerOne.currentHealth}/${playerOne.initialHealth}`, context, "16px", "red");
+            posX += 24;
+            posY += 30;
 
-                // Draw items
-                posX = 170;
-                let itemPosY = posY + 31; // Adjusted for correct positioning
-                const items = playerOne.items;
-
-                if (items && items["type"] !== "Buffer") {
-                    for (let itemCount = 0; itemCount < 5 && itemCount < items.length; itemCount++) {
-                        const itemInfo = this.itemsInfo[items[itemCount]];
-                        if (itemInfo && this.settings.GetPreloadedImage(itemInfo, "Items") !== null) {
-                            this.DrawCustomImage(context, posX, itemPosY, itemInfo, "Items", itemSize);
-                            posX += itemSize + itemGap;
-
-                            if (posX > playerBoxWidth - itemSize) {
-                                posX = 15;
-                                itemPosY += itemSize + itemGap;
-                            }
-                        }
-                    }
-                }
+            if (items["type"] === "Buffer") // No items
+            {
+                posX = 0;
+                posY += 46;
+                continue;
             }
+
+            for (const item of items)
+            {
+                const itemInfo = this.itemsInfo[item];
+
+                if (itemInfo != undefined && this.settings.GetPreloadedImage(itemInfo, "Items") !== null)
+                {
+                    this.DrawCustomImage(context, posX, posY, itemInfo, "Items", 56);
+                    }
+
+                posX += 54;
+                itemsListString += item.toString() + " ";
+                }
+
+            if (devMode)
+            {
+                this.drawTextItems(posTemp, posY - 5, itemsListString, context, "14px", "white");
+            }
+      
+            posY += 46;
         }
+
     }
 
     interpolate(players, lpX, lpY, t) {
+
+
+
         for (const playerOne of players) {
+
+
+
+
+
+
             const hX = -1 * playerOne.posX + lpX;
             const hY = playerOne.posY - lpY;
-            let distance = Math.round(
-                Math.sqrt(
-                    (playerOne.posX - lpX) * (playerOne.posX - lpX) +
-                    (playerOne.posY - lpY) * (playerOne.posY - lpY)
-                )
-            );
+            let distance = Math.round(Math.sqrt(((playerOne.posX - lpX) * (playerOne.posX - lpX)) + ((playerOne.posY - lpY) * (playerOne.posY - lpY))));
             playerOne.distance = distance;
             if (playerOne.hY == 0 && playerOne.hX == 0) {
                 playerOne.hX = hX;
                 playerOne.hY = hY;
+
             }
+
+
+
 
             playerOne.hX = this.lerp(playerOne.hX, hX, t);
             playerOne.hY = this.lerp(playerOne.hY, hY, t);
-        }
-    }
 
-    invalidate(context, players, alreadyFilteredPlayers, filteredGuilds, filteredAlliances) {
-        const showFilteredPlayers = this.settings.returnLocalBool("settingDrawFilteredPlayers");
-        const showFilteredGuilds = this.settings.returnLocalBool("settingDrawFilteredGuilds");
-        const showFilteredAlliances = this.settings.returnLocalBool("settingDrawFilteredAlliances");
 
-        for (const playerOne of players) {
+
+
+
+            }
+
+            }
+
+    invalidate(context, players)
+    {
+        for (const playerOne of players)
+        {
             const point = this.transformPoint(playerOne.hX, playerOne.hY);
             let space = 0;
 
-            if (!showFilteredGuilds && filteredGuilds.find((name) => name === playerOne.guildName.toUpperCase()))
-                continue;
-            if (!showFilteredAlliances && filteredAlliances.find((name) => name === playerOne.alliance.toUpperCase()))
-                continue;
-            if (!showFilteredPlayers && alreadyFilteredPlayers.find((name) => name === playerOne.nickname.toUpperCase()))
-                continue;
-
-            const flagId = playerOne.flagId || 0;
-            const flagName = FactionFlagInfo[flagId];
-
-            // Check if the player is part of filtered guilds/alliances/players
-            let isFiltered = false;
-            let iconName = '';
-
-            if (filteredGuilds.find((name) => name === playerOne.guildName.toUpperCase())) {
-                isFiltered = true;
-                iconName = 'guild';
-            } else if (filteredAlliances.find((name) => name === playerOne.alliance.toUpperCase())) {
-                isFiltered = true;
-                iconName = 'alliance';
-            } else if (alreadyFilteredPlayers.find((name) => name === playerOne.nickname.toUpperCase())) {
-                isFiltered = true;
-                iconName = 'player';
+            if (this.settings.settingDot == true)
+            {
+                this.drawFilledCircle(context, point.x, point.y, 10, "red");
             }
-
-            // Draw the status circle for mounted/unmounted status
-            if (this.settings.settingMounted) {
-                context.beginPath();
-                context.arc(point.x, point.y, 11, 0, 2 * Math.PI, false); // Adjust the circle position and radius as needed
-                context.strokeStyle = playerOne.mounted ? 'green' : 'red';
-                context.lineWidth = 3;
-                context.stroke();
+            if (this.settings.settingMounted)
+            {
+                if (playerOne.mounted)
+                {
+                    this.drawText(point.x, point.y +3, "M", context);
+                }
             }
-
-            if (isFiltered) {
-                // Draw the custom icon for filtered players
-                this.DrawCustomImage(context, point.x, point.y, iconName, "Flags", 20); // Adjust the icon position and size as needed
-            } else {
-                // Draw the status icon for unfiltered players
-                this.DrawCustomImage(context, point.x, point.y, flagName, "Flags", 20);
-            }
-
-            if (this.settings.settingNickname) {
-                space = space + 23;
+            if (this.settings.settingNickname == true)
+            {
+                space = space + 20;
                 this.drawText(point.x, point.y + space, playerOne.nickname, context);
             }
-            if (this.settings.settingDistance) {
+            if (this.settings.settingDistance)
+            {
                 this.drawText(point.x, point.y - 14, playerOne.distance + "m", context);
             }
 
-            if (this.settings.settingHealth) {
+            if (this.settings.settingHealth)
+            {
                 space = space + 6;
 
                 const percent = playerOne.currentHealth / playerOne.initialHealth;
@@ -172,28 +156,30 @@ export class PlayersDrawing extends DrawingUtils {
                 let height = 7;
 
                 context.fillStyle = "#121317";
-                context.fillRect(
-                    point.x - width / 2,
-                    point.y - height / 2 + space,
-                    width,
-                    height
-                );
+                context.fillRect(point.x - width / 2, point.y - height / 2 + space, width, height);
 
                 context.fillStyle = "red";
-                context.fillRect(
-                    point.x - width / 2,
-                    point.y - height / 2 + space,
-                    width * percent,
-                    height
-                );
+                context.fillRect(point.x - width/2, point.y - height/2 + space, width * percent, height);
+             //   this.drawText(point.x, point.y + space, playerOne.currentHealth, context);
             }
-            if (this.settings.settingGuild) {
+            if (this.settings.settingGuild)
+            {
                 space = space + 14;
 
-                if (playerOne.guildName != "undefined") {
+                if (playerOne.guildName != "undefined")
+                {
                     this.drawText(point.x, point.y + space, playerOne.guildName, context);
                 }
             }
+
+            const flagId = playerOne.flagId || 0
+            const flagName = FactionFlagInfo[flagId]
+            const nicknameWidth = context.measureText(playerOne.nickname).width / 2
+            const healthWidth = 66 / 2
+            const farthest = Math.max(nicknameWidth, healthWidth)
+            const xPos = farthest + 10
+            const yPos = space / 2 + 5
+            this.DrawCustomImage(context, point.x + xPos, point.y + yPos, flagName, 'Flags', 20)
         }
     }
 }

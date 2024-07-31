@@ -1,16 +1,5 @@
 class Player {
-  constructor(
-    posX,
-    posY,
-    id,
-    nickname,
-    guildName1,
-    currentHealth,
-    initialHealth,
-    items,
-    flagId,
-    alliance
-  ) {
+    constructor(posX, posY, id, nickname, guildName1, currentHealth, initialHealth, items, flagId) {
     this.posX = posX;
     this.posY = posY;
     this.oldPosX = posX;
@@ -18,14 +7,13 @@ class Player {
     this.id = id;
     this.nickname = nickname;
     this.guildName = guildName1;
-    this.alliance = alliance;
     this.hX = 0;
     this.hY = 0;
     this.currentHealth = currentHealth;
     this.initialHealth = initialHealth;
     this.items = items;
     this.flagId = flagId;
-    this.mounted = false;
+        this.mounted = false; // Initialize mounted status as false
   }
 
   setMounted(mounted) {
@@ -41,30 +29,30 @@ export class PlayersHandler {
 
     this.settings = settings;
 
-    this.filteredPlayers = [];
-    this.filteredGuilds = [];
-    this.filteredAlliances = [];
+        this.ignorePlayers = [];
+        this.ignoreGuilds = [];
+        this.ignoreAlliances = [];
 
-    this.alreadyFilteredPlayers = [];
+        this.alreadyIgnoredPlayers = [];
 
     this.settings.ignoreList.forEach((element) => {
-      const name = element["Name"];
+            const name = element['Name'];
 
-      switch (element["Type"]) {
-        case "Player":
-          this.filteredPlayers.push(name);
+            switch (element['Type']) {
+                case 'Player':
+                    this.ignorePlayers.push(name);
           break;
 
-        case "Guild":
-          this.filteredGuilds.push(name);
+                case 'Guild':
+                    this.ignoreGuilds.push(name);
           break;
 
-        case "Alliance":
-          this.filteredAlliances.push(name);
+                case 'Alliance':
+                    this.ignoreAlliances.push(name);
           break;
 
         default: // Default is player
-          this.filteredPlayers.push(name);
+                    this.ignorePlayers.push(name);
           break;
       }
     });
@@ -73,20 +61,25 @@ export class PlayersHandler {
   getPlayersInRange() {
     try {
       return [...this.playersInRange]; // Create a copy of the array
-    } finally {}
+        } finally {
+
+        }
   }
 
   updateItems(id, Parameters) {
+
     let items = null;
 
     try {
       items = Parameters[2];
-    } catch {
+        }
+        catch
+        {
       items = null;
     }
 
     if (items != null) {
-      this.playersInRange.forEach((playerOne) => {
+            this.playersInRange.forEach(playerOne => {
         if (playerOne.id === id) {
           playerOne.items = items;
         }
@@ -94,31 +87,64 @@ export class PlayersHandler {
     }
   }
 
-  handleNewPlayerEvent(Parameters) {
-    if (!this.settings.settingOnOff) return;
+    handleNewPlayerEvent(Parameters)
+    {
+        if (!this.settings.settingDot)
+            return;
+        const flagId = Parameters[51];
+        
+        if ((flagId == 0) && (this.settings.ignoreFlagList0))
+            return;
 
-    /* General */
-    const id = Parameters[0];
+        if ((flagId == 1) && (this.settings.ignoreFlagList1))
+             return;
+        
+        if ((flagId == 2) && (this.settings.ignoreFlagList2))
+             return;
+        
+        if ((flagId == 3) && (this.settings.ignoreFlagList3))
+             return;
+        
+        if ((flagId == 4) && (this.settings.ignoreFlagList4))
+             return;
+        
+        if ((flagId == 5) && (this.settings.ignoreFlagList5))
+             return;
+        
+        if ((flagId == 6) && (this.settings.ignoreFlagList6))
+             return;
+        
+        if ((flagId == 255) && (this.settings.ignoreFlagList255))
+             return;
+
     const nickname = Parameters[1];
+        if (this.alreadyIgnoredPlayers.find(name => name === nickname.toUpperCase()))
+            return;
 
-    if (this.alreadyFilteredPlayers.find((name) => name === nickname.toUpperCase())) return;
+        /* General */
+        const id = Parameters[0];
 
-    if (this.filteredPlayers.find((name) => name === nickname.toUpperCase())) {
-      this.alreadyFilteredPlayers.push(nickname.toUpperCase());
+        if (this.ignorePlayers.find(name => name === nickname.toUpperCase()))
+        {
+            this.alreadyIgnoredPlayers.push(nickname.toUpperCase());
+            return;
     }
 
     const guildName = String(Parameters[8]);
 
-    if (this.filteredGuilds.find((name) => name === guildName.toUpperCase())) {
-      this.alreadyFilteredPlayers.push(nickname.toUpperCase());
+        if (this.ignoreGuilds.find(name => name === guildName.toUpperCase()))
+        {
+            this.alreadyIgnoredPlayers.push(nickname.toUpperCase());
+            return;
     }
 
     const alliance = String(Parameters[49]);
 
-    if (this.filteredAlliances.find((name) => name === alliance.toUpperCase())) {
-      this.alreadyFilteredPlayers.push(nickname.toUpperCase());
+        if (this.ignoreAlliances.find(name => name === alliance.toUpperCase()))
+        {
+            this.alreadyIgnoredPlayers.push(nickname.toUpperCase());
+            return;
     }
-
     /* Position */
     var positionArray = Parameters[14];
     const posX = positionArray[0];
@@ -130,85 +156,52 @@ export class PlayersHandler {
 
     /* Items & flag */
     const items = Parameters[38];
-    const flagId = Parameters[51];
 
-    this.addPlayer(
-      posX,
-      posY,
-      id,
-      nickname,
-      guildName,
-      currentHealth,
-      initialHealth,
-      items,
-      this.settings.settingSound,
-      flagId,
-      alliance
-    );
-  }
+        this.addPlayer(posX, posY, id, nickname, guildName, currentHealth, initialHealth, items, this.settings.settingSound, flagId);
+    }
 
-  handleMountedPlayerEvent(id, parameters) {
+    handleMountedPlayerEvent(id, parameters)
+    {
     let ten = parameters[10];
 
     let mounted = parameters[11];
 
-    if (mounted == "true" || mounted == true) {
+        if (mounted == "true" || mounted == true)
+        {
       this.updatePlayerMounted(id, true);
-    } else if (ten == "-1") {
+        } 
+        else if (ten == "-1")
+        {
       this.updatePlayerMounted(id, true);
-    } else {
+        } 
+        else
+        {
       this.updatePlayerMounted(id, false);
     }
   }
 
-  addPlayer(
-    posX,
-    posY,
-    id,
-    nickname,
-    guildName,
-    currentHealth,
-    initialHealth,
-    items,
-    sound,
-    flagId,
-    alliance
-  ) {
-    const existingPlayer = this.playersInRange.find((player) => player.id === id);
+    addPlayer(posX, posY, id, nickname, guildName, currentHealth, initialHealth, items, sound, flagId)
+    {
+        const existingPlayer = this.playersInRange.find(player => player.id === id);
 
     if (existingPlayer) return;
 
-    const player = new Player(
-      posX,
-      posY,
-      id,
-      nickname,
-      guildName,
-      currentHealth,
-      initialHealth,
-      items,
-      flagId,
-      alliance
-    );
+        const player = new Player(posX, posY, id, nickname, guildName, currentHealth, initialHealth, items, flagId);
     this.playersInRange.push(player);
 
     if (!sound) return;
 
-    const audio = new Audio("/sounds/player.mp3");
-
-    // Get volume from the player volume slider (converted from 0-100 to 0.0-1.0 range)
-    const volume = document.getElementById("playerVolumeSlider").value / 100;
-    audio.volume = volume;
-
+        const audio = new Audio('/sounds/player.mp3');
     audio.play();
   }
 
   updateLocalPlayerNextPosition(posX, posY) {
     // TODO: Implement update local player next position
-    throw new Error("Not implemented");
+        throw new Error('Not implemented');
   }
 
-  updatePlayerMounted(id, mounted) {
+    updatePlayerMounted(id, mounted)
+    {
     for (const player of this.playersInRange) {
       if (player.id === id) {
         player.setMounted(mounted);
@@ -217,8 +210,9 @@ export class PlayersHandler {
     }
   }
 
-  removePlayer(id) {
-    this.playersInRange = this.playersInRange.filter((player) => player.id !== id);
+    removePlayer(id)
+    {
+        this.playersInRange = this.playersInRange.filter(player => player.id !== id);
   }
 
   updateLocalPlayerPosition(posX, posY) {
@@ -237,17 +231,21 @@ export class PlayersHandler {
     return this.localPlayer.posY;
   }
 
-  updatePlayerPosition(id, posX, posY) {
-    for (const player of this.playersInRange) {
-      if (player.id === id) {
+    updatePlayerPosition(id, posX, posY)
+    {
+        for (const player of this.playersInRange)
+        {
+            if (player.id === id)
+            {
         player.posX = posX;
         player.posY = posY;
       }
     }
   }
 
-  UpdatePlayerHealth(Parameters) {
-    var uPlayer = this.playersInRange.find((player) => player.id === Parameters[0]);
+    UpdatePlayerHealth(Parameters)
+    {
+        var uPlayer = this.playersInRange.find(player => player.id === Parameters[0]);
 
     if (!uPlayer) return;
 
@@ -255,7 +253,8 @@ export class PlayersHandler {
     uPlayer.initialHealth = Parameters[3];
   }
 
-  clear() {
+    clear()
+    {
     this.playersInRange = [];
   }
 }
