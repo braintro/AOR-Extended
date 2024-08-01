@@ -20,14 +20,14 @@
         }
 
         #playersCanvas {
-            left: 520px; /* Position to the right of mapCanvas which is 500px wide plus margin */
+            left: 620px; /* Position to the right of mapCanvas which is 500px wide plus margin */
             width: 500px;
             height: 500px;
         }
 
         #controlsContainer {
             position: absolute;
-            top: 520px;
+            top: 620px;
             left: 0;
             background-color: #1a1c23;
             color: white;
@@ -73,12 +73,12 @@
 </head>
 <body>
     <div id="canvasContainer">
-        <canvas id="mapCanvas" width="500" height="500"></canvas>
-        <canvas id="gridCanvas" width="500" height="500"></canvas>
-        <canvas id="ourPlayerCanvas" width="500" height="500"></canvas>
+        <canvas id="mapCanvas" width="600" height="600"></canvas>
+        <canvas id="gridCanvas" width="600" height="600"></canvas>
+        <canvas id="ourPlayerCanvas" width="600" height="600"></canvas>
         <canvas id="playersCanvas" width="500" height="500"></canvas>
-        <canvas id="drawCanvas" width="500" height="500"></canvas>
-        <canvas id="nametagRangeCanvas" width="500" height="500"></canvas>
+        <canvas id="drawCanvas" width="600" height="600"></canvas>
+        <canvas id="nametagRangeCanvas" width="600" height="600"></canvas>
         <div id="controlsContainer">
             <button id="button" class="control-button">Clear the Radar</button>
             <button id="logEnemiesList" class="control-button">Log Enemies List</button>
@@ -157,11 +157,11 @@
             $('#switchPositionButton').click(function() {
                 controlsAtBottom = !controlsAtBottom;
                 if (controlsAtBottom) {
-                    $('#controlsContainer').css({ 'top': '520px', 'left': '0' });
-                    $('#playersCanvas').css({ 'top': '0', 'left': '520px' });
+                    $('#controlsContainer').css({ 'top': '620px', 'left': '0' });
+                    $('#playersCanvas').css({ 'top': '0', 'left': '620px' });
                 } else {
-                    $('#controlsContainer').css({ 'top': '0', 'left': '520px' });
-                    $('#playersCanvas').css({ 'top': '520px', 'left': '0' });
+                    $('#controlsContainer').css({ 'top': '0', 'left': '620px' });
+                    $('#playersCanvas').css({ 'top': '620px', 'left': '0' });
                 }
             });
         });

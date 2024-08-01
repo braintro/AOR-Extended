@@ -101,8 +101,8 @@
     newX *= 4;
     newY *= 4;
 
-    newX += 250;
-    newY += 250;
+    newX += 300;
+    newY += 300;
 
     return { x: newX, y: newY };
   }
