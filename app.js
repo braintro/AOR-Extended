@@ -77,7 +77,7 @@ app.use("/images/Flags", express.static(__dirname + "/images/Flags"));
 app.use("/sounds", express.static(__dirname + "/sounds"));
 app.use("/config", express.static(__dirname + "/config"));
 
-const port = 5001;
+const port = 5101;
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
@@ -143,7 +143,7 @@ c.on("packet", function (nbytes, trunc) {
   } catch {}
 });
 
-const server = new WebSocket.Server({ port: 5002, host: "localhost" });
+const server = new WebSocket.Server({ port: 5102, host: "localhost" });
 server.on("listening", () => {
   manager.on("event", (dictonary) => {
     const dictionaryDataJSON = JSON.stringify(dictonary);

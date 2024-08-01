@@ -76,7 +76,7 @@ drawingUtils.initCanvas(canvas, context);
 drawingUtils.initGridCanvas(canvasGrid, contextGrid);
 drawingUtils.InitOurPlayerCanvas(canvasOurPlayer, contextOurPlayer);
 
-const socket = new WebSocket("ws://localhost:5002");
+const socket = new WebSocket("ws://localhost:5102");
 
 socket.addEventListener("open", (event) => {
   console.log("Connected to the WebSocket server.");
